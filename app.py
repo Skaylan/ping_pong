@@ -1,4 +1,4 @@
-import pygame, sys
+import pygame, sys, time
 from pygame.locals import *
 
 WIDTH = 800
@@ -43,7 +43,7 @@ def main():
 
 
     #PLAYER 1
-    player = Player(20, 70)
+    player = Player(10, HEIGHT/2)
     player_splrites = pygame.sprite.Group()
     player_splrites.add(player)
     player_ponto = 0
@@ -51,16 +51,19 @@ def main():
 
 
     #PLAYER 2
-    player2 = Player(WIDTH - 20, HEIGHT - 70)
+    player2 = Player(WIDTH - 10, HEIGHT / 2)
     player2_sprites = pygame.sprite.Group()
     player2_sprites.add(player2)
     player2_ponto = 0
 
 
+    # #LINHA
+    # linha = pygame.Rect(WIDTH / 2, 0, 5, HEIGHT)
+
     #BALL
     ball = pygame.Rect(WIDTH / 2 - 15, HEIGHT / 2 - 15,30,30)
-    ball_speed_x = 5
-    ball_speed_y = 5
+    ball_speed_x = 7
+    ball_speed_y = 7
     
 
     while True:
@@ -73,6 +76,7 @@ def main():
 
 
         screen.fill(BLACK)
+        pygame.draw.aaline(screen, WHITE, (WIDTH / 2, 0), (WIDTH/2, HEIGHT), 5)
         pygame.draw.ellipse(screen, (255,255,255), ball)
         ball.x += ball_speed_x
         ball.y += ball_speed_y
@@ -85,9 +89,13 @@ def main():
             ball_speed_x *= -1
 
         if ball.right >= WIDTH:
+            ball.centerx, ball.centery = WIDTH/2, HEIGHT/2
+            time.sleep(1)
             player_ponto += 1
         
         if ball.left <= 0:
+            ball.centerx, ball.centery = WIDTH/2, HEIGHT/2
+            time.sleep(1)
             player2_ponto += 1
 
         player_splrites.draw(screen)
@@ -97,13 +105,12 @@ def main():
         player2_sprites.update(K_UP, K_DOWN)
 
         player_pontos_label = font.render(f' {player2_ponto} ', 1, (255, 255, 255))
-        screen.blit(player_pontos_label, (WIDTH / 2 , HEIGHT/ 2))
-        dash = font.render('-', 1, (255,255,255))
+        screen.blit(player_pontos_label, (WIDTH / 2 - 45 , HEIGHT/ 2))
 
-        player2_pontos_label = font.render(f' {player_ponto} ', 1, (255, 255, 255))
-        screen.blit(player2_pontos_label, (WIDTH / 2 - 30, HEIGHT/ 2 ))
 
-        screen.blit(dash, (WIDTH /2 , HEIGHT/2))    
+        player2_pontos_label = font.render(f' {player_ponto} ', 1, (255, 255, 0))
+        screen.blit(player2_pontos_label, (WIDTH / 2 , HEIGHT/ 2 ))
+  
 
 
 
