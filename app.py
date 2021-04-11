@@ -1,7 +1,7 @@
-import pygame, sys, time
+import pygame, sys, random
 from pygame.locals import *
 
-WIDTH = 800
+WIDTH = 1000
 HEIGHT = 600
 WHITE = (255,255,255)
 BLACK = (0,0,0)
@@ -14,7 +14,7 @@ class Player(pygame.sprite.Sprite):
         self.image.fill(WHITE)
         self.rect = self.image.get_rect()
         self.rect.center = (posx, posy)
-        self.speed = 5
+        self.speed = 7
 
 
     def update(self, tecla_up, tecla_down):
@@ -32,15 +32,49 @@ class Player(pygame.sprite.Sprite):
             self.rect.top = 0
         if self.rect.bottom >= HEIGHT:
             self.rect.bottom = HEIGHT
+
+
+def reset_ball():
+    global ball_speed_x, ball_speed_y, timer
+
+    ball.center = WIDTH/2, HEIGHT/2
+    current_time = pygame.time.get_ticks()
+
+    if current_time - timer < 2000:
+        ball_speed_x = 0
+        ball_speed_y = 0
+    else:
+        ball_speed_x = 7 * random.choice((1, -1))
+        ball_speed_y = 7 * random.choice((1, -1))
+        timer = None
+
+def ball_logic():
+    global ball_speed_x, ball_speed_y, player2_ponto, player_ponto, timer
+    ball.x += ball_speed_x
+    ball.y += ball_speed_y
+    if ball.top <= 0 or ball.bottom >= HEIGHT:
+        ball_speed_y *= -1
+    if ball.left <= 0 or ball.right >= WIDTH:
+        ball_speed_x *= -1
+    if ball.colliderect(player2.rect) or ball.colliderect(player.rect):
+        ball_speed_x *= -1
+
+    if ball.right >= WIDTH:
+        player_ponto += 1
+        timer = pygame.time.get_ticks()
         
+    if ball.left <= 0:
+        player2_ponto += 1
+        timer = pygame.time.get_ticks()
 
 def main():
+    global ball, ball_speed_x, ball_speed_y, timer, player, player2, player2_ponto, player_ponto
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption('Ping-Pong')
     fps = pygame.time.Clock()
     font = pygame.font.SysFont("monospace", 26)
-
+    timer = None
 
     #PLAYER 1
     player = Player(10, HEIGHT/2)
@@ -65,7 +99,7 @@ def main():
     ball_speed_x = 7
     ball_speed_y = 7
     
-
+    
     while True:
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -78,25 +112,9 @@ def main():
         screen.fill(BLACK)
         pygame.draw.aaline(screen, WHITE, (WIDTH / 2, 0), (WIDTH/2, HEIGHT), 5)
         pygame.draw.ellipse(screen, (255,255,255), ball)
-        ball.x += ball_speed_x
-        ball.y += ball_speed_y
-        if ball.top <= 0 or ball.bottom >= HEIGHT:
-            ball_speed_y *= -1
-        if ball.left <= 0 or ball.right >= WIDTH:
-            ball_speed_x *= -1
-
-        if ball.colliderect(player2.rect) or ball.colliderect(player.rect):
-            ball_speed_x *= -1
-
-        if ball.right >= WIDTH:
-            ball.centerx, ball.centery = WIDTH/2, HEIGHT/2
-            time.sleep(1)
-            player_ponto += 1
-        
-        if ball.left <= 0:
-            ball.centerx, ball.centery = WIDTH/2, HEIGHT/2
-            time.sleep(1)
-            player2_ponto += 1
+        ball_logic()
+            
+            
 
         player_splrites.draw(screen)
         player_splrites.update(K_w, K_s)
@@ -112,11 +130,48 @@ def main():
         screen.blit(player2_pontos_label, (WIDTH / 2 , HEIGHT/ 2 ))
   
 
-
+        if timer:
+            reset_ball()
 
         fps.tick(60)
         pygame.display.flip()
 
 
 
-main()
+
+
+def menu():
+    pygame.init()
+    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    pygame.display.set_caption('Ping-Pong')
+    fps = pygame.time.Clock()
+    font = pygame.font.SysFont("monospace", 26)
+
+    button = pygame.Rect(WIDTH/2 - 50, HEIGHT/2, 100, 50)
+
+    
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+
+            if event.type == MOUSEBUTTONDOWN:
+                mouse_pos = event.pos
+
+                if button.collidepoint(mouse_pos):
+                    main()
+
+        start_label = font.render('START', 1, (255,255,0))
+
+        screen.fill(BLACK)
+        pygame.draw.rect(screen, (255,0,0), button)
+        screen.blit(start_label, (WIDTH/2 - 40, HEIGHT/2 + 10))
+        fps.tick(60)
+        pygame.display.flip()
+
+
+
+
+menu()
