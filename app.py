@@ -60,11 +60,11 @@ def ball_logic():
         ball_speed_x *= -1
 
     if ball.right >= WIDTH:
-        player_ponto += 1
+        player2_ponto += 1
         timer = pygame.time.get_ticks()
         
     if ball.left <= 0:
-        player2_ponto += 1
+        player_ponto += 1
         timer = pygame.time.get_ticks()
 
 def main():
